@@ -1,5 +1,5 @@
 # Checker-Machine-Learning
 
  # Project on going ..
- SALUT <3
+ SALUT ❤
  Current state : built game logic and interface.
