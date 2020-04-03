@@ -43,7 +43,7 @@ class Player():
                     sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
-                if 1100 > pos[0] > 900 and 350 > pos[1] > 300:
+                if 1101 > pos[0] > 1050 and 526 > pos[1] > 475:
                     table.undo()
                     return False
                 if 1100 > pos[0] > 900 and 650 > pos[1] > 600:

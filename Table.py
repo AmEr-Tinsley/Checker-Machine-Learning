@@ -24,6 +24,7 @@ class Table():
          self.player1 = Player(self.board.whitepieces)
          self.player2 = Player(self.board.blackpieces)
          self.states = []
+         self.undoimg = pygame.image.load("Images/UNDO.png")
          pygame.init()
          self.FPSCLOCK = pygame.time.Clock()
 
@@ -187,7 +188,9 @@ class Table():
                     self.cnt+=1
                     self.states.append((self.player_copy(self.player1),self.player_copy(self.player2),self.board_copy(self.board)))
             if self.cnt > 0:
-                self.build_button("Previous state",900,300,200,50)
+                self.display_text("Undo move : ",980,500)
+                self.DISPLAYSURF.blit(self.undoimg, (1050,475))
+                #self.build_button("Previous state",900,300,200,50)
                 
             pygame.display.update()
             self.FPSCLOCK.tick(self.FPS)
