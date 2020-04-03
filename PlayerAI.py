@@ -6,4 +6,5 @@ Created on Mon Mar 30 22:18:10 2020
 """
 
 class PlayerAI():
+    print("hello")
     
