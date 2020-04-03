@@ -62,16 +62,16 @@ class Table():
                     sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
-                if 500 > pos[0] > 300 and 250 > pos[1] > 50:
+                if 500 > pos[0] > 300 and 250 > pos[1] > 200:
                     self.set_up_players(1,1)
                     self.load_game()
-                elif 500 > pos[0] > 300 and 350 > pos[1] > 50:
+                elif 500 > pos[0] > 300 and 350 > pos[1] > 300:
                     self.set_up_players(1,1)
                     self.load_game()
-                elif 500 > pos[0] > 300 and 450 > pos[1] > 50:
+                elif 500 > pos[0] > 300 and 450 > pos[1] > 400:
                     self.set_up_players(1,1)
                     self.load_game()
-                elif 500 > pos[0] > 300 and 550 > pos[1] > 50:
+                elif 500 > pos[0] > 300 and 550 > pos[1] > 500:
                     self.quit()
                     
         
