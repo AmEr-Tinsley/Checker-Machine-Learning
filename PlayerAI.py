@@ -40,6 +40,7 @@ class PlayerAI():
                     table.undo()
                     return False
                 if 1100 > pos[0] > 900 and 650 > pos[1] > 600:
+                    table.FPS = 60
                     table.menu()
                     return False
     def go(self,pieces,board,otherplayer,table):
@@ -69,12 +70,13 @@ class PlayerAI():
             otherplayer.pieces.remove(piece)
             table.board.pieces.remove(piece)
             ok = True
+        wasking = self.clicked_piece.king
         self.clicked_piece.update(x*board.BOXWIDTH + 10,y*board.BOXHEIGHT + 10,board)
-        if(not (len(self.clicked_piece.can_eat(board))==0 or ok == False)):
+        if(not (len(self.clicked_piece.can_eat(board))==0 or ok == False) and (wasking == self.clicked_piece.king)):
             self.completethemove = True
         else:
             self.completethemove = False
-        return (len(self.clicked_piece.can_eat(board))==0 or ok == False)
+        return (len(self.clicked_piece.can_eat(board))==0 or ok == False) or (wasking != self.clicked_piece.king)
     def should_eat(self,board):
         L = []
         for piece in self.pieces:

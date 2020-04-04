@@ -53,8 +53,6 @@ class Table():
         self.board.whitepieces = []
         self.board.board = []
         self.board.init_board()
-        if player1 ==0 and player2 == 0:
-            self.AIVSAI = True
         if player1 == 0:    
             self.player1 = PlayerAI(self.board.whitepieces)
         else:
@@ -212,11 +210,9 @@ class Table():
                     remaining_time = 300
                     self.cnt+=1
                     self.states.append((self.player_copy(self.player1),self.player_copy(self.player2),self.board_copy(self.board)))
-            if self.cnt > 0:
+            if self.cnt > 0 and self.FPS !=1 :
                 self.display_text("Undo move : ",980,500)
-                self.DISPLAYSURF.blit(self.undoimg, (1050,475))
-                #self.build_button("Previous state",900,300,200,50)
-                
+                self.DISPLAYSURF.blit(self.undoimg, (1050,475))                
             pygame.display.update()
             self.FPSCLOCK.tick(self.FPS)
 if __name__ == "__main__":

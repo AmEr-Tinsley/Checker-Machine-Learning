@@ -71,15 +71,16 @@ class Player():
                             otherplayer.pieces.remove(piece)
                             table.board.pieces.remove(piece)
                             ok = True
+                        wasking = self.clicked_piece.king
                         self.clicked_piece.update(x*board.BOXWIDTH + 10,y*board.BOXHEIGHT + 10,board)
                         self.reset_displayed_moves(board)
                                 
                         self.displayed_moves = []
-                        if(not (len(self.clicked_piece.can_eat(board))==0 or ok == False)):
+                        if(not (len(self.clicked_piece.can_eat(board))==0 or ok == False) and (wasking == self.clicked_piece.king)):
                             self.completethemove = True
                         else:
                             self.completethemove = False
-                        return (len(self.clicked_piece.can_eat(board))==0 or ok == False)                       
+                        return (len(self.clicked_piece.can_eat(board))==0 or ok == False) or (wasking != self.clicked_piece.king)                      
                 for piece in pieces:
                     if ((piece.x-10)//board.BOXWIDTH == pos[0]//board.BOXWIDTH) and ((piece.y-10)//board.BOXHEIGHT == pos[1]//board.BOXHEIGHT) :
                         self.reset_displayed_moves(board)
