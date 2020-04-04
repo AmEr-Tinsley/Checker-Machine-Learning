@@ -8,7 +8,8 @@ from Board import Board
 import pygame, sys, random,copy
 from pygame.locals import *
 from Player import Player
-
+from PlayerAI import PlayerAI
+import time
 class Table():
     def __init__(self):
          self.WINDOWWIDTH = 800
@@ -52,8 +53,16 @@ class Table():
         self.board.whitepieces = []
         self.board.board = []
         self.board.init_board()
-        self.player1 = Player(self.board.whitepieces)
-        self.player2 = Player(self.board.blackpieces)
+        if player1 ==0 and player2 == 0:
+            self.AIVSAI = True
+        if player1 == 0:    
+            self.player1 = PlayerAI(self.board.whitepieces)
+        else:
+            self.player1 = Player(self.board.whitepieces)
+        if player2 == 0:
+            self.player2 = PlayerAI(self.board.blackpieces)
+        else:
+            self.player2 = Player(self.board.blackpieces)
         
     def check_click(self):
         for event in pygame.event.get():
@@ -64,12 +73,15 @@ class Table():
                 pos = pygame.mouse.get_pos()
                 if 500 > pos[0] > 300 and 250 > pos[1] > 200:
                     self.set_up_players(1,1)
+                    self.FPS = 60
                     self.load_game()
                 elif 500 > pos[0] > 300 and 350 > pos[1] > 300:
-                    self.set_up_players(1,1)
+                    self.set_up_players(1,0)
+                    self.FPS = 30
                     self.load_game()
                 elif 500 > pos[0] > 300 and 450 > pos[1] > 400:
-                    self.set_up_players(1,1)
+                    self.set_up_players(0,0)
+                    self.FPS = 1
                     self.load_game()
                 elif 500 > pos[0] > 300 and 550 > pos[1] > 500:
                     self.quit()
@@ -136,6 +148,19 @@ class Table():
         return copy.deepcopy(player)
     def board_copy(self,board):
         return copy.deepcopy(board)
+    def check_game_over(self):
+        if len(self.player1.pieces)==0 or len(self.player2.pieces)==0:
+                self.quit()
+        cnt = 0
+        for piece in self.player1.pieces:
+            cnt+=len(piece.display_possible_moves(self.board))
+        if cnt == 0:
+            self.quit()
+        cnt = 0
+        for piece in self.player2.pieces:
+            cnt+=len(piece.display_possible_moves(self.board))
+        if cnt == 0:
+            self.quit()
     def load_game(self):
         self.states.clear()
         self.WINDOWWIDTH = 1200
@@ -148,8 +173,7 @@ class Table():
         self.cnt = 0
         self.states.append((self.player_copy(self.player1),self.player_copy(self.player2),self.board_copy(self.board)))        
         while True:
-            if len(self.player1.pieces)==0 or len(self.player2.pieces)==0:
-                self.quit()
+            self.check_game_over()
             for x, line in enumerate(self.board.board):
                 for y, box in enumerate(line):
                     if box == (102,204,25):
@@ -170,7 +194,8 @@ class Table():
             who = "Who's playing ? : " + ('White' if self.turn == False else 'Black')
             timer =  "Remaining time : "+self.conv(remaining_time)
             self.display_text(who,1000,50)
-            self.display_text(timer,1000,100)
+            if self.FPS != 1:    
+                self.display_text(timer,1000,100)
             self.build_button("Back To menu",900,600,200,50)
             
             if self.turn == 0:

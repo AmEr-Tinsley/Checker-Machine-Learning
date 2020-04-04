@@ -36,6 +36,7 @@ class Player():
                 if board.board[x][y] == (102,204,25):
                     board.board[x][y] = (255, 255, 255)
     def go(self,pieces,board,otherplayer,table):
+        
         for event in pygame.event.get():
             ok = False
             if event.type == QUIT:
