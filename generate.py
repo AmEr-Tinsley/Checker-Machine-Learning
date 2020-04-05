@@ -1,15 +1,15 @@
-
+import pyodbc as p
 import sqlite3
 
-"""conn = p.connect('Driver={SQL Server};'
+conn = p.connect('Driver={SQL Server};'
                  'Server=LAPTOP-MP8CPB9L;'
                  'Database=checkers;'
-                 'Trusted_Connection=yes;')"""
+                 'Trusted_Connection=yes;')
 
 conn2 = sqlite3.connect("training.db")
 c=conn2.cursor()
 
-#cursor = conn.cursor()
+cursor = conn.cursor()
 
 board = []
 
@@ -132,8 +132,6 @@ def show(s):
     print()
     print()
 
-show('bbbbbbbbbbbbeeeeeweewewwwwwwwwww')
-"""
 lines = cursor.execute("SELECT * FROM checkers.dbo.mouvement").fetchall()
 
 idp = 0
@@ -145,12 +143,12 @@ for row in lines:
         #print("#######################################################")
         init()
         idp=game
-        gain = get_gain(int(row[2]),int(row[3]))
+        gain = get_gain(int(row[2]),int(row[3])) * 2
+        if gain==0:
+            gain+=1
     move(row[1],gain)
     gain*=-1
-
 
 conn2.commit()
 conn.close()
 conn2.close()
-"""

@@ -81,8 +81,8 @@ class PlayerAI():
             return False
         ok = False
         move = None
-        
-        mx = -10000
+        moves = []
+
         for piece in pieces:
             L = piece.display_possible_moves(board)
             xx = (piece.x-10)//board.BOXWIDTH
@@ -91,25 +91,22 @@ class PlayerAI():
                 From = self.get(xx,yy) 
                 To = self.get(mv[0],mv[1])
                 m = str(From)+'_'+str(To)
-                print(m)
                 self.c.execute("""SELECT gain FROM visited where state=? AND move=?""",(self.hash(board),m))
                 wa = self.c.fetchone()
-                if wa!=None and int(wa[0]) > mx : 
-                    mx = int(wa[0])
-                    self.clicked_piece = piece
-                    move = mv
+                if wa!=None :
+                    moves.append((mv,piece))
                 m = str(From)+'x'+str(To)
-                print(m)
                 self.c.execute("""SELECT gain FROM visited where state=? AND move=?""",(self.hash(board),m))
                 wa = self.c.fetchone()
-                if wa!=None and int(wa[0]) > mx : 
-                    mx = int(wa[0])
-                    self.clicked_piece = piece
-                    move = mv
-        print(mx)        
-        if move == None:
+                if wa!=None: 
+                    moves.append((mv,piece))
+        if len(moves) == 0:
+            print('on my own')
             self.clicked_piece = random.choice(pieces)
             move = random.choice(self.clicked_piece.display_possible_moves(table.board))
+        else:
+            p = random.choice(moves)
+            move,self.clicked_piece = p[0],p[1]
         x = move[0]
         y = move[1]
         xx = (self.clicked_piece.x-10)//board.BOXWIDTH
