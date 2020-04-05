@@ -8,6 +8,8 @@ import pygame, sys, random
 from pygame.locals import *
 from Piece import Piece
 from copy import copy, deepcopy
+import sqlite3
+
 class PlayerAI():
     def __init__(self,pieces,clicked_piece = 1,displayed_moves = [],eat_moves=[],completethemove=False):
         self.clicked_piece = clicked_piece
@@ -15,6 +17,8 @@ class PlayerAI():
         self.displayed_moves = displayed_moves
         self.eat_moves = []
         self.completethemove = completethemove
+        self.conn = sqlite3.connect("training.db")
+        self.c=self.conn.cursor()
     def __copy__(self):
         return type(self)(self.pieces,self.clicked_piece,self.displayed_moves,self.eat_moves,self.completethemove)
     def __deepcopy__(self, memo): # memo is a dict of id's to copies
@@ -40,17 +44,72 @@ class PlayerAI():
                     table.undo()
                     return False
                 if 1100 > pos[0] > 900 and 650 > pos[1] > 600:
+                    self.conn.close()
                     table.FPS = 60
                     table.menu()
                     return False
+    def get(self,xx,yy):
+        cnt = 0
+        for x in range(8):
+            for y in range(8):
+                if (x+y)%2==1:
+                    cnt+=1
+                if(x==yy and y == xx):
+                    return 33-cnt
+    def hash(self,board):
+        ret=""
+        for i in range(32):
+            ret+='e'
+        L = list(ret)
+        for piece in board.pieces:
+            x = (piece.x-10)//board.BOXWIDTH
+            y = (piece.y-10)//board.BOXHEIGHT
+            wa = self.get(x,y)-1
+            L[wa]=piece.color[0]
+            if piece.king == True:
+                L[wa] = L[wa].upper()
+        L.reverse()
+        ret = "".join(L)
+        return ret
+            
+            
+            
     def go(self,pieces,board,otherplayer,table):
         ok = self.human_intervention(table)
         
         if ok == False:
             return False
         ok = False
-        self.clicked_piece = random.choice(pieces)
-        move = random.choice(self.clicked_piece.display_possible_moves(table.board))
+        move = None
+        
+        mx = -10000
+        for piece in pieces:
+            L = piece.display_possible_moves(board)
+            xx = (piece.x-10)//board.BOXWIDTH
+            yy = (piece.y-10)//board.BOXHEIGHT
+            for mv in L:
+                From = self.get(xx,yy) 
+                To = self.get(mv[0],mv[1])
+                m = str(From)+'_'+str(To)
+                print(m)
+                self.c.execute("""SELECT gain FROM visited where state=? AND move=?""",(self.hash(board),m))
+                wa = self.c.fetchone()
+                if wa!=None and int(wa[0]) > mx : 
+                    mx = int(wa[0])
+                    self.clicked_piece = piece
+                    move = mv
+                m = str(From)+'x'+str(To)
+                print(m)
+                self.c.execute("""SELECT gain FROM visited where state=? AND move=?""",(self.hash(board),m))
+                wa = self.c.fetchone()
+                if wa!=None and int(wa[0]) > mx : 
+                    mx = int(wa[0])
+                    self.clicked_piece = piece
+                    move = mv
+        print(mx)        
+        if move == None:
+            self.clicked_piece = random.choice(pieces)
+            move = random.choice(self.clicked_piece.display_possible_moves(table.board))
         x = move[0]
         y = move[1]
         xx = (self.clicked_piece.x-10)//board.BOXWIDTH
