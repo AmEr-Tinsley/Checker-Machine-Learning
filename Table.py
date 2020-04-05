@@ -74,7 +74,7 @@ class Table():
                     self.FPS = 60
                     self.load_game()
                 elif 500 > pos[0] > 300 and 350 > pos[1] > 300:
-                    self.set_up_players(0,1)
+                    self.set_up_players(1,0)
                     self.FPS = 30
                     self.load_game()
                 elif 500 > pos[0] > 300 and 450 > pos[1] > 400:
