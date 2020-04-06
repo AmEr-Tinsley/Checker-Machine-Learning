@@ -9,8 +9,8 @@ from pygame.locals import *
 from Piece import Piece
 from copy import copy, deepcopy
 import sqlite3
-
-class PlayerAI():
+# this AI is based only on the experience of many games database that were played by expert players 
+class PlayerAI1():
     def __init__(self,pieces,clicked_piece = 1,displayed_moves = [],eat_moves=[],completethemove=False):
         self.clicked_piece = clicked_piece
         self.pieces = pieces
@@ -72,7 +72,14 @@ class PlayerAI():
         ret = "".join(L)
         return ret
             
-            
+    def search_the_move(self,mv,c,moves,piece,xx,yy,board):
+        From = self.get(xx,yy) 
+        To = self.get(mv[0],mv[1])
+        m = str(From)+c+str(To)
+        self.c.execute("""SELECT gain FROM visited where state=? AND move=?""",(self.hash(board),m))
+        wa = self.c.fetchone()
+        if wa!=None :
+            moves.append((mv,piece))
             
     def go(self,pieces,board,otherplayer,table):
         ok = self.human_intervention(table)
@@ -88,18 +95,9 @@ class PlayerAI():
             xx = (piece.x-10)//board.BOXWIDTH
             yy = (piece.y-10)//board.BOXHEIGHT
             for mv in L:
-                From = self.get(xx,yy) 
-                To = self.get(mv[0],mv[1])
-                m = str(From)+'_'+str(To)
-                self.c.execute("""SELECT gain FROM visited where state=? AND move=?""",(self.hash(board),m))
-                wa = self.c.fetchone()
-                if wa!=None :
-                    moves.append((mv,piece))
-                m = str(From)+'x'+str(To)
-                self.c.execute("""SELECT gain FROM visited where state=? AND move=?""",(self.hash(board),m))
-                wa = self.c.fetchone()
-                if wa!=None: 
-                    moves.append((mv,piece))
+                self.search_the_move(mv,'_',moves,piece,xx,yy,board)
+                self.search_the_move(mv,'x',moves,piece,xx,yy,board)
+    
         if len(moves) == 0:
             print('on my own')
             self.clicked_piece = random.choice(pieces)

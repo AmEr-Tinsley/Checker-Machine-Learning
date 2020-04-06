@@ -8,8 +8,8 @@ from Board import Board
 import pygame, sys, random,copy
 from pygame.locals import *
 from Player import Player
-from PlayerAI import PlayerAI
-import time
+from PlayerAI1 import PlayerAI1
+
 class Table():
     def __init__(self):
          self.WINDOWWIDTH = 800
@@ -54,11 +54,11 @@ class Table():
         self.board.board = []
         self.board.init_board()
         if player1 == 0:    
-            self.player1 = PlayerAI(self.board.whitepieces)
+            self.player1 = PlayerAI1(self.board.whitepieces)
         else:
             self.player1 = Player(self.board.whitepieces)
         if player2 == 0:
-            self.player2 = PlayerAI(self.board.blackpieces)
+            self.player2 = PlayerAI1(self.board.blackpieces)
         else:
             self.player2 = Player(self.board.blackpieces)
         
