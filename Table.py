@@ -12,6 +12,8 @@ from PlayerAI1 import PlayerAI1
 
 class Table():
     def __init__(self):
+         self.remaining_time=300
+         self.Timer=0
          self.WINDOWWIDTH = 800
          self.WINDOWHEIGHT = 700
          self.FPS = 60
@@ -28,6 +30,7 @@ class Table():
          self.undoimg = pygame.image.load("Images/UNDO.png")
          pygame.init()
          self.FPSCLOCK = pygame.time.Clock()
+         self.img={'White_wins':pygame.image.load('Images/White_wins.png'),'Black_wins':pygame.image.load('Images/Black_wins.png')}
 
 
 
@@ -79,11 +82,22 @@ class Table():
                     self.load_game()
                 elif 500 > pos[0] > 300 and 450 > pos[1] > 400:
                     self.set_up_players(0,0)
-                    self.FPS = 1
+                    self.FPS = 5
                     self.load_game()
                 elif 500 > pos[0] > 300 and 550 > pos[1] > 500:
                     self.quit()
+                
                     
+    def check_back_menu(self):
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                if 1100 > pos[0] > 900 and 650 > pos[1] > 600:
+                    self.FPS=60
+                    self.menu()
         
     def quit(self):
         pygame.quit()
@@ -148,31 +162,24 @@ class Table():
         return copy.deepcopy(board)
     def check_game_over(self):
         if len(self.player1.pieces)==0 or len(self.player2.pieces)==0:
-                self.quit()
+                self.draw_board(True,"White_wins" if len(self.player2.pieces)==0 else "Black_wins")
+                return True
         cnt = 0
         for piece in self.player1.pieces:
             cnt+=len(piece.display_possible_moves(self.board))
         if cnt == 0:
-            self.quit()
+            self.draw_board(True,"Black_wins")
+            return True 
         cnt = 0
         for piece in self.player2.pieces:
             cnt+=len(piece.display_possible_moves(self.board))
         if cnt == 0:
-            self.quit()
-    def load_game(self):
-        self.states.clear()
-        self.WINDOWWIDTH = 1200
-        self.WINDOWHEIGHT = 700
-        self.DISPLAYSURF = pygame.display.set_mode((self.WINDOWWIDTH, self.WINDOWHEIGHT))
-        pygame.display.set_caption("Dames")
-        self.turn = 0
-        Timer = 0
-        remaining_time = 300
-        self.cnt = 0
-        self.states.append((self.player_copy(self.player1),self.player_copy(self.player2),self.board_copy(self.board)))        
-        while True:
-            self.check_game_over()
-            for x, line in enumerate(self.board.board):
+            self.draw_board(True,"White_wins")
+            return True
+        return False
+    
+    def draw_board(self,game_over = False,winner = None):
+        for x, line in enumerate(self.board.board):
                 for y, box in enumerate(line):
                     if box == (102,204,25):
                         pygame.draw.rect(self.DISPLAYSURF, box, (x * self.board.BOXWIDTH, y * self.board.BOXHEIGHT, self.board.BOXWIDTH, self.board.BOXHEIGHT))
@@ -181,38 +188,60 @@ class Table():
                             self.DISPLAYSURF.blit(self.KT, (x*self.board.BOXWIDTH,y*self.board.BOXHEIGHT))
                         else:
                            self. DISPLAYSURF.blit(self.WT, (x*self.board.BOXWIDTH,y*self.board.BOXHEIGHT))
-            for piece in self.board.pieces:
-                piece.draw(self.DISPLAYSURF)
-            pygame.draw.rect(self.DISPLAYSURF, (0,0,0), (8 * self.board.BOXWIDTH, 0, 400, 700))
-            Timer+=1
-            if(Timer % 10 == 0):
-                remaining_time-=1
-            if remaining_time == 0:
-                self.quit()
-            who = "Who's playing ? : " + ('White' if self.turn == False else 'Black')
-            timer =  "Remaining time : "+self.conv(remaining_time)
+        for piece in self.board.pieces:
+            piece.draw(self.DISPLAYSURF)
+        pygame.draw.rect(self.DISPLAYSURF, (0,0,0), (8 * self.board.BOXWIDTH, 0, 400, 700))
+        self.Timer+=1
+        if(self.Timer % 10 == 0):
+            self.remaining_time-=1
+        who = "Who's playing ? : " + ('White' if self.turn == False else 'Black')
+        timer =  "Remaining time : "+self.conv(self.remaining_time)
+        if not game_over:
             self.display_text(who,1000,50)
-            if self.FPS != 1:    
+            if self.FPS != 5:    
                 self.display_text(timer,1000,100)
-            self.build_button("Back To menu",900,600,200,50)
-            
+        self.build_button("Back To menu",900,600,200,50)
+        
+        if game_over :
+            self.check_back_menu()  
+            self.DISPLAYSURF.blit(self.img[winner], (900,200)) 
+            pygame.display.update()
+            self.FPSCLOCK.tick(60)
+        else:           
+            if self.cnt > 0 and self.FPS !=5 :
+                self.display_text("Undo move : ",980,500)
+                self.DISPLAYSURF.blit(self.undoimg, (1050,475))
+    
+    def load_game(self):
+        self.states.clear()
+        self.WINDOWWIDTH = 1200
+        self.WINDOWHEIGHT = 700
+        self.DISPLAYSURF = pygame.display.set_mode((self.WINDOWWIDTH, self.WINDOWHEIGHT))
+        pygame.display.set_caption("Dames")
+        self.turn = 0
+        self.Timer = 0
+        self.remaining_time = 300
+        self.cnt = 0
+        self.states.append((self.player_copy(self.player1),self.player_copy(self.player2),self.board_copy(self.board)))        
+        while True:
+            if self.check_game_over() :
+                continue
+            self.draw_board()        
             if self.turn == 0:
                 if self.player1.make_a_move(self):
                     self.turn = 1
-                    Timer = 0
-                    remaining_time = 300
+                    self.Timer = 0
+                    self.remaining_time = 300
                     self.cnt += 1
                     self.states.append((self.player_copy(self.player1),self.player_copy(self.player2),self.board_copy(self.board)))
             else:
                 if self.player2.make_a_move(self):
                     self.turn = 0
-                    Timer = 0
-                    remaining_time = 300
+                    self.Timer = 0
+                    self.remaining_time = 300
                     self.cnt+=1
                     self.states.append((self.player_copy(self.player1),self.player_copy(self.player2),self.board_copy(self.board)))
-            if self.cnt > 0 and self.FPS !=1 :
-                self.display_text("Undo move : ",980,500)
-                self.DISPLAYSURF.blit(self.undoimg, (1050,475))                
+                           
             pygame.display.update()
             self.FPSCLOCK.tick(self.FPS)
 if __name__ == "__main__":
