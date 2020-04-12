@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 """
 Created on Sun Mar 29 19:53:26 2020
@@ -9,6 +10,8 @@ from pygame.locals import *
 from Player import Player
 from PlayerAI1 import PlayerAI1
 from MCTS_AI import MCTS_AI
+from MINIMAX_AI import PlayerMINMAX
+
 class Table():
     def __init__(self):
          self.remaining_time=300
@@ -57,12 +60,14 @@ class Table():
         self.board.init_board()
         if player1 == 0:    
             self.player1 = MCTS_AI(self.board.whitepieces)
+
         else:
-            self.player1 = PlayerAI1(self.board.whitepieces)
+            self.player1 = Player(self.board.whitepieces)
         if player2 == 0:
             self.player2 = MCTS_AI(self.board.blackpieces)
+
         else:
-            self.player2 = PlayerAI1(self.board.blackpieces)
+            self.player2 = Player(self.board.blackpieces)
         
     def check_click(self):
         for event in pygame.event.get():
@@ -78,6 +83,7 @@ class Table():
                 elif 500 > pos[0] > 300 and 350 > pos[1] > 300:
                     self.set_up_players(1,0)
                     self.FPS = 5
+
                     self.load_game()
                 elif 500 > pos[0] > 300 and 450 > pos[1] > 400:
                     self.set_up_players(0,0)

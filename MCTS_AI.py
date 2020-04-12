@@ -57,9 +57,8 @@ class MCTS_AI:
         if ok == False:
             return False
         ok = False
-        start = time.time()
-            
         Tree.discover(instance)
+
         xx,yy,x,y = Tree.get_the_best(instance)
         
 

@@ -16,11 +16,12 @@ class MCTS:
         self.cnt = defaultdict(int)
         self.children  = dict()
     def discover(self,node):
-        for i in range(10):
-            x = node
-            path = self.go_down(x)
-            leaf = path[-1]
-            self.expand(leaf)
+        self.expand(node)
+        path = self.go_down(node)
+        leaf = path[-1]
+        self.expand(leaf)
+        print(len(path))
+        for i in range(50): 
             w = self.simulate(leaf)
             self.back_propagate(path,w)
     def go_down(self,node):
@@ -39,6 +40,9 @@ class MCTS:
         if node in self.children:
             return  
         self.children[node] = node.get_childrens()
+
+    
+    
     def simulate(self,node):
         invert_reward = True
         cnt = 0
@@ -50,7 +54,30 @@ class MCTS:
             if(x.turn != node.turn):
                 invert_reward = not invert_reward
             cnt+=1
+        
         return 0.5
+
+    def get_heuristic(self,node):
+        h = 0
+        for piece in node.board.pieces:
+            if piece.color[0] == 'w':
+                if piece.king:
+                    h+= 10
+                else:
+                    x = (piece.y - 10) // node.board.BOXHEIGHT
+                    h+= 5 + 2 * int(x<4)
+            else:
+                if piece.king:
+                    h-= 10
+                else:
+                    x = (piece.y - 10) // node.board.BOXHEIGHT
+                    h-= 5 + 2 * int(x>=4)
+
+        if node.player.pieces[0].color[0] == 'b':
+            h*=-1
+        return h
+            
+    
     def back_propagate(self, path, reward):
         cnt = 0
         last = None
@@ -61,7 +88,8 @@ class MCTS:
             self.score[node] += reward
             last = node
             cnt+=1
-            reward = 1 - reward 
+            reward = 1 - reward
+            
     def uct_select(self, node):
 
         log_N_vertex = math.log(self.cnt[node])
@@ -73,7 +101,7 @@ class MCTS:
             return node.get_transition(node.find_random_child())
         def sc(n):
             if self.cnt[n]==0:
-                return float('-inf')
+                return -1000000000
             return self.score[n]/self.cnt[n]
         who = max(self.children[node],key=sc)
         return node.get_transition(who)
