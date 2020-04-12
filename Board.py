@@ -58,4 +58,36 @@ class Board():
             memo[id_self] = _copy 
         return _copy
     
+    def hash(self):
+        ret = ""
+        for y in range(8):
+            for x in range(8):
+                if (x+y)%2==1:
+                    X = (x *self.BOXWIDTH+10)
+                    Y = (y*self.BOXHEIGHT+10)
+                    flag = False
+                    for piece in self.pieces:
+                        if(X == piece.x and Y == piece.y):
+                            ret+= (piece.color[0] if not piece.king else piece.color[0].upper())
+                            flag = True
+                    if flag==False:
+                        ret+='e'
+        return ret
+    def game_over(self):
+        if(len(self.blackpieces)==0):
+            return 1
+        if(len(self.whitepieces)==0):
+            return 0
+        cnt = 0
+        for piece in self.blackpieces:
+            cnt+=len(piece.display_possible_moves(self))
+        if cnt == 0:
+            return 1 
+        cnt = 0
+        for piece in self.whitepieces:
+            cnt+=len(piece.display_possible_moves(self))
+        if cnt == 0:
+            return 0
+        return -1
+    
         
