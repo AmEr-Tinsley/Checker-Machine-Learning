@@ -7,13 +7,15 @@ Created on Fri Apr 10 16:05:47 2020
 from copy import copy, deepcopy
 from Board import Board
 import random
+import multiprocessing as mp
+
 class GameInstance:
     def __init__(self,turn,board,player,otherplayer):
         self.turn = turn
         self.board = board
         self.player = player
         self.otherplayer = otherplayer
-        
+        self.childrens = []
         
     def hash(self):
         return self.board.hash()
@@ -105,21 +107,26 @@ class GameInstance:
             return GameInstance(self.turn,board,player,otherplayer)
         
     def find_random_child(self):
-        pieces = self.possible_pieces_to_move()
-        piece = random.choice(pieces)
-        moves = piece.display_possible_moves(self.board)
-        mv = random.choice(moves)
-        ret = (self.do_this_move(piece,mv))
+        if len(self.childrens)==0:
+            pieces = self.possible_pieces_to_move()
+            piece = random.choice(pieces)
+            moves = piece.display_possible_moves(self.board)
+            mv = random.choice(moves)
+            return (self.do_this_move(piece,mv))
+        ret = random.choice(self.childrens)
         return ret
-    
     def get_childrens(self):
+        if len(self.childrens)>0:
+            return self.childrens
+        pool = mp.Pool(5)
         pieces = self.possible_pieces_to_move()
-        ret = []
         for piece in pieces:
-            L = piece.display_possible_moves(self.board)
+            L = pool.apply_async(piece.display_possible_moves,(self.board,))
+            L = L.get()
             for mv in L:
-                ret.append(self.do_this_move(piece,mv))
-        return ret
+                self.childrens.append(self.do_this_move(piece,mv))
+        
+        return self.childrens
     def is_terminal(self):
         return self.board.game_over() != -1
     def show(self,s):

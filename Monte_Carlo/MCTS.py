@@ -9,21 +9,19 @@ import math
 import time
 import random
 from copy import deepcopy
-    
+import multiprocessing as mp
 class MCTS:
     def __init__(self):
         self.score = defaultdict(int)
         self.cnt = defaultdict(int)
         self.children  = dict()
     def discover(self,node):
-        self.expand(node)
         path = self.go_down(node)
         leaf = path[-1]
         self.expand(leaf)
-        print(len(path))
-        for i in range(50): 
-            w = self.simulate(leaf)
-            self.back_propagate(path,w)
+        w = self.simulate(leaf)
+        self.back_propagate(path,w)
+        return [self.cnt,self.score,self.children]
     def go_down(self,node):
         path = []
         while True:
@@ -38,7 +36,7 @@ class MCTS:
             node = self.uct_select(node)
     def expand(self,node):
         if node in self.children:
-            return  
+            return
         self.children[node] = node.get_childrens()
 
     
@@ -56,7 +54,6 @@ class MCTS:
             cnt+=1
         
         return 0.5
-
     def get_heuristic(self,node):
         h = 0
         for piece in node.board.pieces:
@@ -76,6 +73,7 @@ class MCTS:
         if node.player.pieces[0].color[0] == 'b':
             h*=-1
         return h
+
             
     
     def back_propagate(self, path, reward):
@@ -91,12 +89,13 @@ class MCTS:
             reward = 1 - reward
             
     def uct_select(self, node):
-
         log_N_vertex = math.log(self.cnt[node])
         def uct(n):
             return self.score[n] / self.cnt[n] + math.sqrt(log_N_vertex / self.cnt[n])
         return max(self.children[node], key=uct)
     def get_the_best(self, node):
+        self.discover(node)
+        self.discover(node)
         if node not in self.children:
             return node.get_transition(node.find_random_child())
         def sc(n):

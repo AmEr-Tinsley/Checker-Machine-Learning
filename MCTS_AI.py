@@ -57,11 +57,7 @@ class MCTS_AI:
         if ok == False:
             return False
         ok = False
-        Tree.discover(instance)
-
         xx,yy,x,y = Tree.get_the_best(instance)
-        
-
         for piece in self.pieces:
             if piece.x == (xx*table.board.BOXWIDTH + 10) and piece.y == (yy*table.board.BOXHEIGHT+10):
                 self.clicked_piece = piece
