@@ -59,11 +59,11 @@ class Table():
         self.board.board = []
         self.board.init_board()
         if player1 == 0:    
-            self.player1 = PlayerMINMAX(self.board.whitepieces)
+            self.player1 = PlayerAI1(self.board.whitepieces)
         else:
             self.player1 = Player(self.board.whitepieces)
         if player2 == 0:
-            self.player2 = PlayerMINMAX(self.board.blackpieces)
+            self.player2 = PlayerAI1(self.board.blackpieces)
         else:
             self.player2 = Player(self.board.blackpieces)
         

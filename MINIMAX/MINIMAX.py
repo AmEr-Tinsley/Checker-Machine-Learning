@@ -6,7 +6,6 @@ Created on Mon Mar 30 22:18:10 2020
 """
 import pygame, sys, random
 from pygame.locals import *
-from Piece import Piece
 from copy import copy, deepcopy
 
 
@@ -15,7 +14,7 @@ class MINIMAX():
         self.grid=[]
         self.dx=[1,1,-1,-1]
         self.dy=[1,-1,1,-1]
-        self.MAX_DEPTH=4
+        self.MAX_DEPTH=5
 
     def init_grid(self,board):
         self.grid=[]
@@ -88,10 +87,10 @@ class MINIMAX():
     def get_eat_moves(self,from_x,from_y,sequence,possible_moves):
         # 0 -> 3 King moves
         s , e = 0 , 4
-        # 0 -> 1 White moves
+        # 2 -> 3 White moves
         if   self.grid[from_x][from_y]  == 'w':
             s=2
-        # 2 -> 3 Black moves
+        # 0 -> 1 Black moves
         elif self.grid[from_x][from_y]  == 'b':
             e=2
         cannot_eat=True
@@ -153,7 +152,7 @@ class MINIMAX():
         return False
         
 
-    def get_move_score(self,player,depth,move):
+    def get_move_score(self,player,depth,move,alpha,beta):
         eaten_pieces = []
 
         self.make_moves(move,eaten_pieces)
@@ -161,7 +160,7 @@ class MINIMAX():
         
         king = self.check_king(player,x,y)
  
-        score = self.search_best_move(self.inverse_player(player),depth+1)[1]
+        score = self.search_best_move(self.inverse_player(player),depth+1,alpha,beta)[1]
                     
         if king:
             self.grid[x][y] = player
@@ -194,39 +193,76 @@ class MINIMAX():
         for x in range (8):
             for y in range(8):
                 if   self.grid[x][y] == 'w':
-                    h+= 5 + 2*int(x<4)
+                    h+= 12 - x
                 elif self.grid[x][y] == 'b':
-                    h-= 5 + 2*int(x>=4)
+                    h-=  5 + x
                 elif self.grid[x][y] == 'W':
-                    h+= 10
+                    h+= 15
                 elif self.grid[x][y] == 'B':
-                    h-= 10
+                    h-= 15
         return h
-    
-    def search_best_move(self,player,depth):
-        if (depth>self.MAX_DEPTH):
-            return [],self.get_heuristic()
+
+    def quiet_search(self,player):
+        possible_moves = []
+        for x in range(8):
+            for y in range(8):
+                if self.grid[x][y].upper() == player.upper():
+                    self.get_eat_moves(x,y,[],possible_moves) 
+        
+        best_score = 10000
+        if player == 'w':
+            best_score*=-1
+            
+        eaten_pieces = []
+        for move in possible_moves:
+            self.make_moves(move,eaten_pieces)
+            x,y = move[0]
+            king = self.check_king(player,x,y)
+            score = self.quiet_search(self.inverse_player(player))
+            if king:
+                self.grid[x][y] = player
+            self.make_moves(move,eaten_pieces)
+            if player == 'w':
+                best_score = max(best_score,score)
+            else:
+                best_score = min(best_score,score)
+
+        if len(possible_moves) == 0:
+            best_score = self.get_heuristic()
+        return best_score
+
+    def search_best_move(self,player,depth,alpha,beta):
+        if (depth > self.MAX_DEPTH):
+            return [],self.quiet_search(player)
         
         possible_moves = self.get_possible_moves(player)        
         best_move = []
-        best_score = 100000
-        if player == 'w':
-            best_score *= -1
+        best_score = alpha
+        if player == 'b':
+            best_score = beta
+
+        prune_search = False
         
         for piece_moves in possible_moves:
             for move in piece_moves:
-                score = self.get_move_score(player,depth,move)
+                if prune_search:
+                    continue
+                score = self.get_move_score(player,depth,move,alpha,beta)
                 if   player == 'w' and score>=best_score:
                     if score>best_score:
                         best_move=[]
                     best_score = score
                     best_move.append(move)
-                    
+                    if beta<=best_score:
+                        prune_search = True
+        
                 elif player == 'b' and score<=best_score:
                     if score<best_score:
                         best_move=[]
                     best_score = score
                     best_move.append(move)
+                    if best_score<=alpha:
+                        prune_search = True
 
         chosen_move = []
         if depth == 1 :
@@ -235,5 +271,5 @@ class MINIMAX():
 
     def get_move(self,player,board):
         self.init_grid(board)
-        return self.search_best_move(player,1)
+        return self.search_best_move(player,1,-10000,10000)
 

@@ -8,6 +8,7 @@ import pygame, sys, random
 from pygame.locals import *
 from Piece import Piece
 from copy import copy, deepcopy
+from MINIMAX_AI import PlayerMINMAX
 import sqlite3
 # this AI is based only on the experience of many games database that were played by expert players 
 class PlayerAI1():
@@ -17,7 +18,7 @@ class PlayerAI1():
         self.displayed_moves = displayed_moves
         self.eat_moves = []
         self.completethemove = completethemove
-        self.conn = sqlite3.connect("training.db")
+        self.conn = sqlite3.connect("Training_database/training.db")
         self.c=self.conn.cursor()
     def __copy__(self):
         return type(self)(self.pieces,self.clicked_piece,self.displayed_moves,self.eat_moves,self.completethemove)
@@ -99,7 +100,15 @@ class PlayerAI1():
                 self.search_the_move(mv,'x',moves,piece,xx,yy,board)
     
         if len(moves) == 0:
+            cp = self.completethemove
+            if self.pieces[0].color == 'white':
+                table.player1 = PlayerMINMAX(table.board.whitepieces)
+                table.player1.completethemove = cp
+            else:
+                table.player2 = PlayerMINMAX(table.board.blackpieces)
+                table.player2.completethemove = cp
             print('on my own')
+            return False
             self.clicked_piece = random.choice(pieces)
             move = random.choice(self.clicked_piece.display_possible_moves(table.board))
         else:
