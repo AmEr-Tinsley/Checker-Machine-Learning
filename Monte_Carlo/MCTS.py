@@ -42,7 +42,7 @@ class MCTS:
     def simulate(self,node):
         cnt = 0
         who = node.turn
-        while cnt <= 60:
+        while cnt <= 120:
             if node.is_terminal() == True:
                 return 1  if (node.turn == who) else 0
             node = node.find_random_child()
@@ -80,7 +80,7 @@ class MCTS:
     def get_the_best(self, node):
         start = time.time()
         cnt = 0 
-        while time.time()-start <= 3:
+        while time.time()-start <= 5:
             cnt+=1
             self.discover(node)
         print(cnt)
