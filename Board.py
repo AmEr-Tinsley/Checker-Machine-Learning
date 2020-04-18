@@ -71,7 +71,9 @@ class Board():
                             ret+= (piece.color[0] if not piece.king else piece.color[0].upper())
                             flag = True
                     if flag==False:
-                        ret+='e'
+                        ret+='.'
+                else:
+                    ret +='.'
         return ret
     def game_over(self):
         if(len(self.blackpieces)==0):

@@ -52,20 +52,23 @@ class Table():
         textRect.center = ( (x+(w/2)), (y+(h/2)) )
         self.DISPLAYSURF.blit(textSurf, textRect)
     def set_up_players(self,player1,player2):
+        del self.board
+        del self.player1
+        del self.player2
         self.board = Board()
         self.board.pieces = []
         self.board.blackpieces = []
         self.board.whitepieces = []
         self.board.board = []
         self.board.init_board()
-        if player1 == 0:    
-            self.player1 = MCTS_AI(self.board.whitepieces)
-        else:
+        if player1 == 1:    
             self.player1 = Player(self.board.whitepieces)
-        if player2 == 0:
-            self.player2 = MCTS_AI(self.board.blackpieces)
         else:
+            self.player1 = MCTS_AI(self.board.whitepieces)
+        if player2 == 1:
             self.player2 = Player(self.board.blackpieces)
+        else:
+            self.player2 = MCTS_AI(self.board.blackpieces)
         
     def check_click(self):
         for event in pygame.event.get():
@@ -205,10 +208,10 @@ class Table():
         self.build_button("Back To menu",900,600,200,50)
         
         if game_over :
-            self.check_back_menu()  
             self.DISPLAYSURF.blit(self.img[winner], (900,200)) 
             pygame.display.update()
             self.FPSCLOCK.tick(60)
+            self.FPS = 60
         else:           
             if self.cnt > 0 and self.FPS !=5 :
                 self.display_text("Undo move : ",980,500)
@@ -224,11 +227,13 @@ class Table():
         self.Timer = 0
         self.remaining_time = 300
         self.cnt = 0
+        self.epoch = 0
+        self.states_visited = []
         self.states.append((self.player_copy(self.player1),self.player_copy(self.player2),self.board_copy(self.board)))        
         while True:
-            if self.check_game_over() :
+            if self.check_game_over():
                 continue
-            self.draw_board()        
+            self.draw_board()
             if self.turn == 0:
                 if self.player1.make_a_move(self):
                     self.turn = 1

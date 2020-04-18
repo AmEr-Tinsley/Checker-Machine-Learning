@@ -6,6 +6,7 @@ Created on Fri Apr 10 18:04:27 2020
 """
 
 from Monte_Carlo.GameInstance import GameInstance
+
 from Monte_Carlo.MCTS import MCTS
 import pygame, sys, random
 from pygame.locals import *
@@ -55,9 +56,11 @@ class MCTS_AI:
         ok = self.human_intervention(table)
         otherplayer = table.player1 if self.pieces[0].color =='black' else table.player2
         if ok == False:
+            del instance
+            del Tree
             return False
         ok = False
-        xx,yy,x,y = Tree.get_the_best(instance)
+        yy,xx,y,x = Tree.get_the_best(instance)
         for piece in self.pieces:
             if piece.x == (xx*table.board.BOXWIDTH + 10) and piece.y == (yy*table.board.BOXHEIGHT+10):
                 self.clicked_piece = piece
@@ -82,12 +85,18 @@ class MCTS_AI:
             self.completethemove = True
         else:
             self.completethemove = False
+        del instance
+        del Tree
         return not self.completethemove
     def make_a_move(self,table):
-        otherplayer = table.player1 if self.pieces[0].color =='black' else table.player2
-        turn = 0 if self.pieces[0].color[0].upper() == 'W' else 1
-       # print(self.completethemove)
-        inst = GameInstance(turn,deepcopy(table.board),deepcopy(self),deepcopy(otherplayer))
+        turn = self.pieces[0].color[0]
+        if self.completethemove:
+           x = (self.clicked_piece.x-10)/table.board.BOXWIDTH
+           y = (self.clicked_piece.y-10)/table.board.BOXHEIGHT
+           inst = GameInstance(table.board.hash(),turn,(y,x))
+        else:
+           inst = GameInstance(table.board.hash(),turn)
+        
         Tree = MCTS()
         return self.go(Tree,inst,table)
     

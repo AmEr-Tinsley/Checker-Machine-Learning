@@ -146,7 +146,7 @@ class PlayerAI1():
             if len(piece.can_eat(board))>0:
                 L.append(piece)
         return L
-    def make_a_move(self,table):
+    def make_a_move(self,table,states_visited = None):
         L = []
         otherplayer = table.player1 if self.pieces[0].color =='black' else table.player2
         if(self.completethemove == True):
