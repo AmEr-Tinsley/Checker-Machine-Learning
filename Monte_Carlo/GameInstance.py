@@ -119,7 +119,7 @@ class GameInstance:
                     me+= 15 if self.board[i][j].istitle() else (12-i if self.board[i][j] == 'w' else 5 + i)
                     All+=15 if self.board[i][j].istitle() else (12-i if self.board[i][j] == 'w' else 5 + i)
                 elif self.board[i][j] != '.':
-                    All+=15 if self.board[i][j].istitle() else 1
+                    All+=15 if self.board[i][j].istitle() else (12-i if self.board[i][j] == 'w' else 5 + i)
         return me/All
     def get_transition(self,wa):
         L = []
