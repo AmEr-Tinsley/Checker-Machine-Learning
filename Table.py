@@ -61,11 +61,11 @@ class Table():
         self.board.whitepieces = []
         self.board.board = []
         self.board.init_board()
-        if player1 == 1:    
+        if player1 == 0:    
             self.player1 = PlayerAI1(self.board.whitepieces)
         else:
             self.player1 = MCTS_AI(self.board.whitepieces)
-        if player2 == 1:
+        if player2 == 0:
             self.player2 = PlayerAI1(self.board.blackpieces)
         else:
             self.player2 = MCTS_AI(self.board.blackpieces)
@@ -212,8 +212,11 @@ class Table():
             pygame.display.update()
             self.FPSCLOCK.tick(60)
             self.FPS = 60
-        else:           
+        else:
+            pygame.display.update()
+            self.FPSCLOCK.tick(self.FPS)
             if self.cnt > 0 and self.FPS !=5 :
+                
                 self.display_text("Undo move : ",980,500)
                 self.DISPLAYSURF.blit(self.undoimg, (1050,475))
     
@@ -248,9 +251,8 @@ class Table():
                     self.remaining_time = 300
                     self.cnt+=1
                     self.states.append((self.player_copy(self.player1),self.player_copy(self.player2),self.board_copy(self.board)))
-                           
-            pygame.display.update()
-            self.FPSCLOCK.tick(self.FPS)
+            self.draw_board()             
+            
 if __name__ == "__main__":
     table = Table()
     table.menu()
