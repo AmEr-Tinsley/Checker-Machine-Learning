@@ -14,7 +14,7 @@ class MINIMAX():
         self.grid=[]
         self.dx=[1,1,-1,-1]
         self.dy=[1,-1,1,-1]
-        self.MAX_DEPTH=4
+        self.MAX_DEPTH=5
 
     def init_grid(self,board):
         self.grid=[]
