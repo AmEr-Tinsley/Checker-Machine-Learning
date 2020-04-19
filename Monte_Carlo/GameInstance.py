@@ -116,10 +116,10 @@ class GameInstance:
         for i in range(8):
             for j in range(8):
                 if self.board[i][j]==self.turn:
-                    me+= 5 if self.board[i][j].istitle() else 1
-                    All+=5 if self.board[i][j].istitle() else 1
+                    me+= 15 if self.board[i][j].istitle() else (12-i if self.board[i][j] == 'w' else 5 + i)
+                    All+=15 if self.board[i][j].istitle() else (12-i if self.board[i][j] == 'w' else 5 + i)
                 elif self.board[i][j] != '.':
-                    All+=5 if self.board[i][j].istitle() else 1
+                    All+=15 if self.board[i][j].istitle() else 1
         return me/All
     def get_transition(self,wa):
         L = []
