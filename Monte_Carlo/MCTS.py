@@ -13,8 +13,6 @@ class MCTS:
     def __init__(self):
         self.score = defaultdict(int)
         self.cnt = defaultdict(int)
-        self.amaf_cnt = dict()
-        self.amaf_score = dict()
         self.children  = dict()
     def discover(self,node):
         path = self.go_down(node)
@@ -61,11 +59,6 @@ class MCTS:
             last = node
             cnt+=1
             reward = 1 - reward
-    def get_beta(self,node):
-        b = 0.5
-        return self.amaf_cnt[node] / (self.cnt[node] + self.amaf_cnt[node] +
-                                   4 * self.cnt[node] * self.amaf_cnt[node] * pow(b, 2))
-            
     def uct_select(self, node):
         log_N_vertex = math.log(self.cnt[node])
         assert all(n in self.children for n in self.children[node])
