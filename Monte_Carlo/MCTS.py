@@ -42,7 +42,7 @@ class MCTS:
     def simulate(self,node):
         cnt = 0
         who = node.turn
-        while cnt <= 70:
+        while cnt <= 90:
             if node.is_terminal() == True:
                 return 1  if (node.turn == who) else 0
             node = node.find_random_child()
