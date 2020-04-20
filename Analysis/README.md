@@ -30,7 +30,7 @@ In this section we will give some analysis that we did on our datasets
 # Best players of all time
 
 
-![Main Screen](charts/bestplayers.png)
+![Main Screen](charts/bestplayerss.png)
 
   
 
