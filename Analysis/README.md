@@ -1,4 +1,4 @@
-#  Analysing the trained database
+#  Analysing the datasets
 
 
 
