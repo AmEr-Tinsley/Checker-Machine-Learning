@@ -1,4 +1,8 @@
 # Checker-Machine-Learning
 
  # Project on going ..
- Current state : built game logic and interface.
+ Current state : 
+  - game logic and interface.
+  - MCTS algorithm
+  - MIN/MAX algorithm
+  - Simple machine learning application
